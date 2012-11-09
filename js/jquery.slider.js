@@ -1,5 +1,5 @@
 /**
- * jquery.slider - Slider ui control in jQuery
+ * jquery.jslider - Slider ui control in jQuery
  * 
  * Written by
  * Egor Khmelev (hmelyoff@gmail.com)
@@ -37,7 +37,7 @@
     return false;
   }
 
-	$.slider = function( node, settings ){
+	$.jslider = function( node, settings ){
 	  var jNode = $(node);
 	  if( !jNode.data( "jslider" ) )
 	    jNode.data( "jslider", new jSlider( node, settings ) );
@@ -45,7 +45,7 @@
 	  return jNode.data( "jslider" );
 	};
 	
-	$.fn.slider = function( action, opt_value ){
+	$.fn.jslider = function( action, opt_value ){
 	  var returnValue, args = arguments;
 	  
 	  function isDef( val ){
@@ -57,7 +57,7 @@
 	  };
 	  
 		this.each(function(){
-		  var self = $.slider( this, action );
+		  var self = $.jslider( this, action );
 		  
 		  // do actions
 		  if( typeof action == "string" ){
@@ -530,8 +530,14 @@
   
   jSlider.prototype.setValue = function(){
     var value = this.getValue();
-    this.inputNode.attr( "value", value );
-    this.onstatechange.call( this, value );
+	// Moviri customization
+	// only change value if really changed 
+	// (if step != 1 jslider position may have change but actual value may still be the same) 
+	if (this.inputNode.attr("value") != value)
+	{
+		this.inputNode.attr( "value", value );
+		this.onstatechange.call( this, value );
+	}
   };
 
   jSlider.prototype.getValue = function(){
@@ -663,6 +669,9 @@
 	    this.parent.settings.callback.call( this.parent, this.parent.getValue() );
 	    
 	  this.ptr.removeDependClass("hover");
+	  // Moviri customization
+	  // only fire event on mouse up
+	  this.parent.inputNode.trigger("change", this.parent.getValue());
 	};
 	
 	jSliderPointer.prototype.setIndexOver = function(){
